@@ -1,0 +1,38 @@
+name: Scrape Google Maps CPAs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        batch: [1, 2, 3, 4]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Run scraper
+        run: node scrape.js
+        env:
+          BATCH_NUM: ${{ matrix.batch }}
+
+      - name: Commit and push results
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git checkout -b results/batch-${{ matrix.batch }}
+          git add US_cities/
+          git diff --cached --quiet || git commit -m "results: batch ${{ matrix.batch }}"
+          git push origin results/batch-${{ matrix.batch }} --force
