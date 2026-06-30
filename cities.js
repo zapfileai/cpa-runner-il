@@ -17,11 +17,13 @@ const illinoisCities = [
   "Brookport", "Buda", "Buffalo", "Buffalo Grove", "Burbank"
 ];
 
-const batches = {
-  1: illinoisCities.slice(0, 20),
-  2: illinoisCities.slice(20, 40),
-  3: illinoisCities.slice(40, 60),
-  4: illinoisCities.slice(60, 80),
-};
+const BATCH_SIZE = 5;
+
+const batches = {};
+for (let i = 0; i < illinoisCities.length; i++) {
+  const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+  if (!batches[batchNum]) batches[batchNum] = [];
+  batches[batchNum].push(illinoisCities[i]);
+}
 
 module.exports = { batches };
